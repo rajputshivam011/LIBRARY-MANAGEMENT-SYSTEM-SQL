@@ -532,7 +532,7 @@ This project demonstrates the application of SQL skills in creating and managing
 👨‍💻 Author
 Shivam Kr. Rajput
 
-Library Managemnt System
+Library Management System
 
 Connect With Me
 LinkedIn: www.linkedin.com/in/shivamkrrajput
