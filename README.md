@@ -310,7 +310,7 @@ Write a query to update the status of books in the books table to "Yes" when the
 
 CREATE OR REPLACE PROCEDURE add_return_records(p_return_id VARCHAR(10), p_issued_id VARCHAR(10), p_book_quality VARCHAR(10))
 LANGUAGE plpgsql
-AS $$
+AS 
 
 DECLARE
     v_isbn VARCHAR(50);
@@ -339,7 +339,7 @@ BEGIN
     RAISE NOTICE 'Thank you for returning the book: %', v_book_name;
     
 END;
-$$
+
 
 
 -- Testing FUNCTION add_return_records
@@ -437,9 +437,25 @@ GROUP BY 1, 2
 ```
 
 **Task 18: Identify Members Issuing High-Risk Books**  
-Write a query to identify members who have issued books more than twice with the status "damaged" in the books table. Display the member name, book title, and the number of times they've issued damaged books.    
+Write a query to identify members who have issued books more than twice with the status "damaged" in the books table. Display the member name, book title, and the number of times they've issued damaged books. 
 
-
+```sql
+SELECT
+    m.member_name,
+    b.book_title,
+    COUNT(*) AS damaged_books_issued
+FROM members m
+JOIN issued_status i
+    ON m.member_id = i.issued_member_id
+JOIN books b
+    ON i.issued_book_isbn = b.isbn
+WHERE b.status = 'damaged'
+GROUP BY
+    m.member_name,
+    b.book_title
+HAVING COUNT(*) > 2
+ORDER BY damaged_books_issued DESC;
+```
 **Task 19: Stored Procedure**
 Objective:
 Create a stored procedure to manage the status of books in a library system.
@@ -454,7 +470,7 @@ If the book is not available (status = 'no'), the procedure should return an err
 
 CREATE OR REPLACE PROCEDURE issue_book(p_issued_id VARCHAR(10), p_issued_member_id VARCHAR(30), p_issued_book_isbn VARCHAR(30), p_issued_emp_id VARCHAR(10))
 LANGUAGE plpgsql
-AS $$
+AS 
 
 DECLARE
 -- all the variabable
@@ -516,8 +532,23 @@ Description: Write a CTAS query to create a new table that lists each member and
     Member ID
     Number of overdue books
     Total fines
+```sql
 
+ENT_DATE - i.issued_date > 30
+            THEN (CURRENT_DATE - i.issued_date - 30) * 0.50
+            ELSE 0
+        END
+    ) AS total_fines,
 
+    COUNT(i.issued_id) AS total_books_issued
+
+FROM issued_status i
+LEFT JOIN return_status r
+       ON i.issued_id = r.issued_id
+GROUP BY i.issued_member_id;
+
+SELECT *FROM overdue_fines_summary;
+```
 
 ## Reports
 
